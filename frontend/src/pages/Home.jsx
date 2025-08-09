@@ -12,16 +12,16 @@ const Home = () => {
   const [globalEmail, setGlobalEmail] = useContext(Context);
   const navigate = useNavigate();
 
-  const backendURL = import.meta.env.VITE_BACKENDURL || "http://localhost:3001";
+  const backendUrl = import.meta.env.VITE_BACKENDURL;
 
   const handleLogout = () => {
-    axios.post(`${backendURL}/users/logout`).then(() => {
+    axios.post(`${backendUrl}/users/logout`).then(() => {
       navigate("/");
     });
   };
 
   useEffect(() => {
-    axios.get(`${backendURL}/users/login`).then((response) => {
+    axios.get(`${backendUrl}/users/login`).then((response) => {
       if (response.data.loggedIn && response.data.user) {
         setGlobalEmail(response.data.user.email);
         navigate(`/home/${response.data.user.email}`);
@@ -29,7 +29,7 @@ const Home = () => {
         navigate("/");
       }
     });
-  }, [backendURL, navigate, setGlobalEmail]);
+  }, [backendUrl, navigate, setGlobalEmail]);
 
   return (
     <div>
