@@ -15,8 +15,8 @@ app.use(
   })
 );
 
-app.use(createSession());
 app.use(cookieParser());
+app.use(createSession());
 
 // JSON body parsing
 app.use(express.json());
