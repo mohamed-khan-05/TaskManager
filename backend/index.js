@@ -14,7 +14,7 @@ app.use(createSession());
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || "http://localhost:5173", // fallback origin
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTION"],
     credentials: true,
   })
 );
