@@ -14,7 +14,7 @@ app.use(createSession());
 app.use(
   cors({
     origin:
-      process.env.CORS_ORIGIN || "https://mohamed-taskmanager.netlify.app",
+      process.env.CORS_ORIGIN || "https://mohamed-taskmanager.netlify.app", // "https://mohamed-taskmanager.netlify.app"
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })

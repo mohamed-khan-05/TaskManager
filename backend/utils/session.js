@@ -6,10 +6,11 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true, // only HTTPS
-    httpOnly: true,
-    sameSite: "none", // allow cross-site cookies (with secure:true)
-    maxAge: 1000 * 60 * 60,
+    secure: true, // Must be true in production (HTTPS)
+    httpOnly: true, // Keep for security (no JS access)
+    sameSite: "none", // Required for cross-site cookies when using secure:true
+    maxAge: 1000 * 60 * 60, // 1 hour
   },
 };
+
 module.exports = createSession = () => session(sessionOptions);

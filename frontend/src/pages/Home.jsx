@@ -6,7 +6,6 @@ import Sidebar from "../components/Sidebar";
 import Tasks from "../components/Tasks";
 import Add from "../components/Add";
 
-// Set axios global defaults here or in your app root (App.jsx)
 axios.defaults.withCredentials = true;
 
 const Home = () => {
@@ -31,24 +30,30 @@ const Home = () => {
   };
 
   useEffect(() => {
-    axios
-      .get(`${backendUrl}/users/login`)
-      .then((response) => {
-        if (response.data.loggedIn && response.data.user) {
-          setGlobalEmail(response.data.user.email);
-          // Avoid redirect loop by checking current path
-          if (location.pathname !== `/home/${response.data.user.email}`) {
-            navigate(`/home/${response.data.user.email}`);
+    if (!globalEmail) {
+      // If email not set, check login status from backend
+      axios
+        .get(`${backendUrl}/users/login`)
+        .then((response) => {
+          if (response.data.loggedIn && response.data.user?.email) {
+            setGlobalEmail(response.data.user.email);
+            if (location.pathname !== `/home/${response.data.user.email}`) {
+              navigate(`/home/${response.data.user.email}`);
+            }
+          } else {
+            navigate("/");
           }
-        } else {
+        })
+        .catch(() => {
           navigate("/");
-        }
-      })
-      .catch((err) => {
-        console.error("Login check failed:", err);
-        navigate("/");
-      });
-  }, [backendUrl, navigate, setGlobalEmail, location.pathname]);
+        });
+    } else {
+      // Email is set, ensure URL matches
+      if (location.pathname !== `/home/${globalEmail}`) {
+        navigate(`/home/${globalEmail}`);
+      }
+    }
+  }, [backendUrl, navigate, setGlobalEmail, globalEmail, location.pathname]);
 
   return (
     <div>
