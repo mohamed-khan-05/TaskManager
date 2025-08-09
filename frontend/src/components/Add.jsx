@@ -5,6 +5,7 @@ import { useParams } from "react-router";
 
 const Add = () => {
   const [task, setTask] = useState();
+  const backendUrl = import.meta.env.VITE_BACKENDURL;
   const [description, setDescription] = useState();
   const [status, setStatus] = useState("Completed");
   let param = useParams("email");
@@ -30,7 +31,7 @@ const Add = () => {
       EndDate: e,
       UserEmail: email,
     };
-    axios.post("http://localhost:3001/tasks/add", d).then((res) => {
+    axios.post(`${backendUrl}/tasks/add`, d).then((res) => {
       toast.success(res.data.message.text);
     });
     setTask("");

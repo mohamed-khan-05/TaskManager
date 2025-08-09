@@ -13,7 +13,8 @@ app.use(createSession());
 // Dynamic CORS configuration
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173", // fallback origin
+    origin:
+      process.env.CORS_ORIGIN || "https://mohamed-taskmanager.netlify.app", // fallback origin
     methods: ["GET", "POST", "PUT", "DELETE", "OPTION"],
     credentials: true,
   })

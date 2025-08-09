@@ -6,6 +6,7 @@ import { FaTrashAlt } from "react-icons/fa";
 
 const Card = (props) => {
   const [count, setCount] = useState(0);
+  const backendUrl = import.meta.env.VITE_BACKENDURL;
   const { globalEmail, tab, setTab, d } = props;
   const { StartDate } = d;
   const { EndDate } = d;
@@ -37,7 +38,7 @@ const Card = (props) => {
     let con = window.confirm("Are you sure you want to delete this Task ?");
     if (con) {
       axios
-        .delete("http://localhost:3001/tasks/delete", {
+        .delete(`${backendUrl}/tasks/delete`, {
           data: { id: d.id },
         })
         .then(() => {
@@ -70,7 +71,7 @@ const Card = (props) => {
     }
 
     axios
-      .put("http://localhost:3001/tasks/updateStatus", {
+      .put(`${backendUrl}/tasks/updateStatus`, {
         id: d.id,
         status: newStatus,
       })

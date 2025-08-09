@@ -3,7 +3,6 @@ const router = express.Router();
 const db = require("../models");
 const Tasks = db.Tasks;
 
-// Display tasks based on type and email query parameter
 router.get("/:type", async (req, res) => {
   const type = req.params.type;
   const email = req.query.email;
@@ -14,7 +13,6 @@ router.get("/:type", async (req, res) => {
     if (type === "Completed" || type === "Pending" || type === "In Progress") {
       filter.status = type;
     }
-    // For "Dashboard" or any other type, no status filter applied
 
     const results = await Tasks.findAll({ where: filter });
 

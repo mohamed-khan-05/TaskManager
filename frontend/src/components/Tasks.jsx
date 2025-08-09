@@ -4,13 +4,14 @@ import Card from "./Card";
 
 const Tasks = (props) => {
   const { globalEmail, tab, setTab } = props;
+  const backendUrl = import.meta.env.VITE_BACKENDURL;
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`http://localhost:3001/tasks/${tab}`, {
+      .get(`${backendUrl}/tasks/${tab}`, {
         params: { email: globalEmail },
       })
       .then((res) => {
