@@ -2,81 +2,63 @@ const express = require("express");
 const router = express.Router();
 const db = require("../models");
 const Tasks = db.Tasks;
-const { sequelize } = db;
 
-// Display tasks
+// Display tasks based on type and email query parameter
 router.get("/:type", async (req, res) => {
   const type = req.params.type;
   const email = req.query.email;
+
   try {
-    let results = [];
-    if (type == "Dashboard") {
-      results = await sequelize.query("SELECT * from Tasks WHERE UserEmail=?", {
-        replacements: [email],
-        type: sequelize.QueryTypes.SELECT,
-      });
-    } else if (type == "Completed") {
-      results = await sequelize.query(
-        "SELECT * from Tasks WHERE UserEmail=? AND status=?",
-        {
-          replacements: [email, type],
-          type: sequelize.QueryTypes.SELECT,
-        }
-      );
-    } else if (type == "Pending") {
-      results = await sequelize.query(
-        "SELECT * from Tasks WHERE UserEmail=? AND status=?",
-        {
-          replacements: [email, type],
-          type: sequelize.QueryTypes.SELECT,
-        }
-      );
-    } else if (type === "In Progress") {
-      let temp = "In Progress";
-      results = await sequelize.query(
-        "SELECT * from Tasks WHERE UserEmail=? AND status=?",
-        {
-          replacements: [email, temp],
-          type: sequelize.QueryTypes.SELECT,
-        }
-      );
+    let filter = { UserEmail: email };
+
+    if (type === "Completed" || type === "Pending" || type === "In Progress") {
+      filter.status = type;
     }
+    // For "Dashboard" or any other type, no status filter applied
+
+    const results = await Tasks.findAll({ where: filter });
 
     res.status(200).json({ message: results });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching tasks:", error);
+    res.status(500).json({ message: "Error fetching tasks" });
   }
 });
 
-// Add task
+// Add a new task
 router.post("/add", async (req, res) => {
-  const d = req.body;
-  console.log(d);
+  const taskData = req.body;
+
   try {
-    await Tasks.create(d);
+    await Tasks.create(taskData);
     res.status(200).json({ message: { text: "Task Added" } });
   } catch (error) {
-    console.log(error);
+    console.error("Error adding task:", error);
+    res.status(500).json({ message: "Error adding task" });
   }
 });
 
-// delete task
+// Delete a task by id
 router.delete("/delete", async (req, res) => {
   const { id } = req.body;
+
   try {
-    const result = await sequelize.query("DELETE from Tasks WHERE id=?", {
-      replacements: [id],
-      type: sequelize.QueryTypes.DELETE,
-    });
-    res.status(200).json({ message: "Successfully deleted" });
+    const deletedCount = await Tasks.destroy({ where: { id } });
+    if (deletedCount > 0) {
+      res.status(200).json({ message: "Successfully deleted" });
+    } else {
+      res.status(404).json({ message: "Task not found" });
+    }
   } catch (error) {
-    console.log(error);
+    console.error("Error deleting task:", error);
+    res.status(500).json({ message: "Error deleting task" });
   }
 });
 
-// update status
+// Update the status of a task by id
 router.put("/updateStatus", async (req, res) => {
   const { id, status } = req.body;
+
   try {
     const task = await Tasks.findByPk(id);
     if (task) {
@@ -87,7 +69,7 @@ router.put("/updateStatus", async (req, res) => {
       res.status(404).json({ message: "Task not found" });
     }
   } catch (error) {
-    console.log(error);
+    console.error("Error updating task status:", error);
     res.status(500).json({ message: "Error updating task status" });
   }
 });

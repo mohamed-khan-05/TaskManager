@@ -11,12 +11,17 @@ const Home = () => {
   const [add, setAdd] = useState(false);
   const [globalEmail, setGlobalEmail] = useContext(Context);
   const navigate = useNavigate();
+
+  const backendURL = import.meta.env.VITE_BACKENDURL || "http://localhost:3001";
+
   const handleLogout = () => {
-    axios.post("http://localhost:3001/users/logout");
-    navigate("/");
+    axios.post(`${backendURL}/users/logout`).then(() => {
+      navigate("/");
+    });
   };
+
   useEffect(() => {
-    axios.get("http://localhost:3001/users/login").then((response) => {
+    axios.get(`${backendURL}/users/login`).then((response) => {
       if (response.data.loggedIn && response.data.user) {
         setGlobalEmail(response.data.user.email);
         navigate(`/home/${response.data.user.email}`);
@@ -24,14 +29,13 @@ const Home = () => {
         navigate("/");
       }
     });
-  }, []);
+  }, [backendURL, navigate, setGlobalEmail]);
+
   return (
     <div>
       <button
         className="fixed z-[1] bottom-5 left-5 p-2 border-1 bg-white border-[#00388b] rounded-lg"
-        onClick={() => {
-          handleLogout();
-        }}
+        onClick={handleLogout}
       >
         Logout
       </button>

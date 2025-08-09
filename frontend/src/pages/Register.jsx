@@ -11,9 +11,11 @@ import { BiHide } from "react-icons/bi";
 
 const Register = () => {
   const navigate = useNavigate();
+  const backendUrl = import.meta.env.VITE_BACKENDURL;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hidden, setHidden] = useState("password");
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = {
@@ -21,8 +23,9 @@ const Register = () => {
       password: password,
       isAdmin: false,
     };
+
     axios
-      .post("http://localhost:3001/users", data)
+      .post(`${backendUrl}/users`, data)
       .then(() => {
         toast.success("User Created successfully");
         setEmail("");
@@ -32,9 +35,13 @@ const Register = () => {
         }, 1000);
       })
       .catch((error) => {
-        toast.error(Object.values(error.response.data).flat().join(", "));
+        const message = error?.response?.data
+          ? Object.values(error.response.data).flat().join(", ")
+          : "Registration failed";
+        toast.error(message);
       });
   };
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex justify-center items-center w-[100vw] h-[100vh] bg-gradient-to-t from-green-600 to-blue-600">
@@ -45,9 +52,7 @@ const Register = () => {
             <input
               className="w-[300px] border-b-2 my-[1.5rem] px-4 py-2 focus:outline-none focus:border-b-slate-500"
               value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-              }}
+              onChange={(e) => setEmail(e.target.value)}
               type="email"
               placeholder="Email"
             />
@@ -57,18 +62,16 @@ const Register = () => {
             <input
               className="w-[300px] border-b-2 my-[1.5rem] px-4 py-2 focus:outline-none focus:border-b-slate-500"
               value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-              }}
+              onChange={(e) => setPassword(e.target.value)}
               type={hidden}
               placeholder="Password"
             />
             <button
               className="absolute"
               type="button"
-              onClick={() => {
-                setHidden(hidden === "password" ? "text" : "password");
-              }}
+              onClick={() =>
+                setHidden(hidden === "password" ? "text" : "password")
+              }
             >
               {hidden === "password" ? (
                 <BiHide className="translate-x-[-20px] translate-y-[33px] size-[20px]" />

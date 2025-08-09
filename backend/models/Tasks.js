@@ -20,7 +20,19 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
+    UserEmail: {
+      // <-- Add this explicitly
+      type: DataTypes.STRING,
+      allowNull: false,
+      references: {
+        model: "Users",
+        key: "email",
+      },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    },
   });
+
   Tasks.associate = (models) => {
     Tasks.belongsTo(models.Users, {
       foreignKey: "UserEmail",
@@ -28,5 +40,6 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "CASCADE",
     });
   };
+
   return Tasks;
 };

@@ -3,91 +3,94 @@ const router = express.Router();
 const db = require("../models");
 const bcrypt = require("bcryptjs");
 const Users = db.Users;
-const { sequelize } = db;
 
-// Users
+// Get all users
 router.get("/", async (req, res) => {
   try {
-    const [results] = await sequelize.query("SELECT * from Users");
-    res.json(results);
+    const users = await Users.findAll();
+    res.json(users);
   } catch (error) {
+    console.error("Error fetching users:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Register
+// Register new user
 router.post("/", async (req, res) => {
   const data = req.body;
-  const [existingUser] = await sequelize.query(
-    "SELECT * FROM Users WHERE email = ?",
-    {
-      replacements: [data.email],
-      type: sequelize.QueryTypes.SELECT,
-    }
-  );
+
   if (!data.email || !data.password) {
     return res.status(400).json({ error: "Fill all fields" });
-  }
-  if (existingUser) {
-    return res.status(500).json({ error: "User already exists" });
   }
 
   try {
+    const existingUser = await Users.findOne({ where: { email: data.email } });
+    if (existingUser) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
-    data.password = hashedPassword;
-    data.isAdmin = false;
-    await Users.create(data);
-    res.status(200).json({ message: "Successfully created user" });
+
+    const newUser = await Users.create({
+      email: data.email,
+      password: hashedPassword,
+      isAdmin: false,
+    });
+
+    res.status(201).json({ message: "Successfully created user" });
   } catch (error) {
+    console.error("Error creating user:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Login
+// Login user
 router.post("/login", async (req, res) => {
   const data = req.body;
+
   if (!data.email || !data.password) {
     return res.status(400).json({ error: "Fill all fields" });
   }
-  const [existingUser] = await sequelize.query(
-    "SELECT * FROM Users where email=?",
-    {
-      replacements: [data.email],
-      type: sequelize.QueryTypes.SELECT,
+
+  try {
+    const existingUser = await Users.findOne({ where: { email: data.email } });
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
     }
-  );
 
-  if (!existingUser) {
-    return res.status(400).json({ message: "User not found" });
-  }
-  const isValid = await bcrypt.compare(data.password, existingUser.password);
-  if (isValid) {
-    req.session.user = {
-      id: existingUser.id,
-      email: existingUser.email,
-      password: existingUser.password,
-      isAdmin: existingUser.isAdmin,
-    };
-    res
-      .status(200)
-      .json({ message: "Login successful", isAdmin: existingUser.isAdmin });
-  } else {
-    res.status(404).json({ message: "Incorrect credentials" });
+    const isValid = await bcrypt.compare(data.password, existingUser.password);
+    if (isValid) {
+      req.session.user = {
+        id: existingUser.id,
+        email: existingUser.email,
+        isAdmin: existingUser.isAdmin,
+      };
+      res
+        .status(200)
+        .json({ message: "Login successful", isAdmin: existingUser.isAdmin });
+    } else {
+      res.status(401).json({ message: "Incorrect credentials" });
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
-router.get("/login", async (req, res) => {
+// Check login status
+router.get("/login", (req, res) => {
   if (req.session.user) {
-    res.send({ loggedIn: true, user: req.session.user });
+    res.json({ loggedIn: true, user: req.session.user });
   } else {
-    res.send({ loggedIn: false });
+    res.json({ loggedIn: false });
   }
 });
 
-// Logout
+// Logout user
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
+      console.error("Logout error:", err);
       return res.status(500).json({ error: "Failed to log out" });
     }
     res.clearCookie("userId", { secure: false, httpOnly: true });

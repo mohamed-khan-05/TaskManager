@@ -5,6 +5,9 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       primaryKey: true,
       unique: true,
+      validate: {
+        isEmail: true,
+      },
     },
     password: {
       type: DataTypes.STRING,
@@ -13,13 +16,18 @@ module.exports = (sequelize, DataTypes) => {
     isAdmin: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      default: false,
+      defaultValue: false,
     },
   });
+
   Users.associate = (models) => {
     Users.hasMany(models.Tasks, {
+      foreignKey: "UserEmail", // <-- Match this to Tasks model foreignKey
+      sourceKey: "email",
       onDelete: "CASCADE",
+      hooks: true,
     });
   };
+
   return Users;
 };

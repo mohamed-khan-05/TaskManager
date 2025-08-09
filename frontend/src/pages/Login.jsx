@@ -7,25 +7,28 @@ import axios from "axios";
 // media
 import { RiLockPasswordLine } from "react-icons/ri";
 import { MdOutlineEmail } from "react-icons/md";
-import { BiShow } from "react-icons/bi";
-import { BiHide } from "react-icons/bi";
+import { BiShow, BiHide } from "react-icons/bi";
 
 const Login = () => {
   axios.defaults.withCredentials = true;
+  const backendUrl = import.meta.env.VITE_BACKENDURL;
+
   const [globalEmail, setGlobalEmail] = useContext(Context);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hidden, setHidden] = useState("password");
   let isAdmin = false;
   const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const data = {
       email: email,
       password: password,
     };
+
     axios
-      .post("http://localhost:3001/users/login", data)
+      .post(`${backendUrl}/users/login`, data)
       .then(async (response) => {
         toast.success("Login Successful");
         isAdmin = response.data.isAdmin;
@@ -44,8 +47,9 @@ const Login = () => {
         toast.error(Object.values(error.response.data).flat().join(", "));
       });
   };
+
   useEffect(() => {
-    axios.get("http://localhost:3001/users/login").then((response) => {
+    axios.get(`${backendUrl}/users/login`).then((response) => {
       if (response.data.loggedIn && response.data.user) {
         if (response.data.user.isAdmin) {
           navigate("/users");
@@ -54,7 +58,7 @@ const Login = () => {
         }
       }
     });
-  }, []);
+  }, [backendUrl, navigate]);
 
   return (
     <form onSubmit={handleSubmit}>
