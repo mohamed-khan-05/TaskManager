@@ -4,9 +4,19 @@ import Users from "./pages/Users";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
+
 export const Context = createContext();
+
 const App = () => {
   const [globalEmail, setGlobalEmail] = useState("");
+
+  // Set axios defaults globally once
+  React.useEffect(() => {
+    import("axios").then(({ default: axios }) => {
+      axios.defaults.withCredentials = true;
+    });
+  }, []);
+
   return (
     <Context.Provider value={[globalEmail, setGlobalEmail]}>
       <Router>
@@ -20,4 +30,5 @@ const App = () => {
     </Context.Provider>
   );
 };
+
 export default App;

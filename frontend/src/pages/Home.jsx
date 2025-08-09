@@ -1,35 +1,54 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../App";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Tasks from "../components/Tasks";
 import Add from "../components/Add";
+
+// Set axios global defaults here or in your app root (App.jsx)
+axios.defaults.withCredentials = true;
 
 const Home = () => {
   const [tab, setTab] = useState("Dashboard");
   const [add, setAdd] = useState(false);
   const [globalEmail, setGlobalEmail] = useContext(Context);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const backendUrl = import.meta.env.VITE_BACKENDURL;
 
   const handleLogout = () => {
-    axios.post(`${backendUrl}/users/logout`).then(() => {
-      navigate("/");
-    });
+    axios
+      .post(`${backendUrl}/users/logout`)
+      .then(() => {
+        setGlobalEmail(""); // clear email on logout
+        navigate("/");
+      })
+      .catch((err) => {
+        console.error("Logout failed:", err);
+      });
   };
 
   useEffect(() => {
-    axios.get(`${backendUrl}/users/login`).then((response) => {
-      if (response.data.loggedIn && response.data.user) {
-        setGlobalEmail(response.data.user.email);
-        navigate(`/home/${response.data.user.email}`);
-      } else {
+    axios
+      .get(`${backendUrl}/users/login`)
+      .then((response) => {
+        if (response.data.loggedIn && response.data.user) {
+          setGlobalEmail(response.data.user.email);
+          // Avoid redirect loop by checking current path
+          if (location.pathname !== `/home/${response.data.user.email}`) {
+            navigate(`/home/${response.data.user.email}`);
+          }
+        } else {
+          navigate("/");
+        }
+      })
+      .catch((err) => {
+        console.error("Login check failed:", err);
         navigate("/");
-      }
-    });
-  }, [backendUrl, navigate, setGlobalEmail]);
+      });
+  }, [backendUrl, navigate, setGlobalEmail, location.pathname]);
 
   return (
     <div>

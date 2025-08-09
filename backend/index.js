@@ -7,22 +7,22 @@ require("dotenv").config();
 
 const app = express();
 
-// Use session middleware (ensure createSession sets up express-session correctly)
+// Use session middleware
 app.use(createSession());
 
-// Dynamic CORS configuration
+// CORS config with credentials & correct origin
 app.use(
   cors({
     origin:
-      process.env.CORS_ORIGIN || "https://mohamed-taskmanager.netlify.app", // fallback origin
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTION"],
+      process.env.CORS_ORIGIN || "https://mohamed-taskmanager.netlify.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
 
 app.use(cookieParser());
 
-// Built-in body parsing middleware replaces body-parser usage
+// JSON body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

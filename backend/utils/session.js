@@ -6,8 +6,9 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false,
+    secure: true, // only HTTPS
     httpOnly: true,
+    sameSite: "none", // allow cross-site cookies (with secure:true)
     maxAge: 1000 * 60 * 60,
   },
 };
