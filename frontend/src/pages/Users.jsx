@@ -8,7 +8,7 @@ const Users = () => {
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
 
-  const backendURL = import.meta.env.VITE_BACKENDURL || "http://localhost:3001";
+  const backendURL = import.meta.env.VITE_BACKENDURL;
 
   const handleLogout = () => {
     axios.post(`${backendURL}/users/logout`).then((response) => {
