@@ -1,16 +1,18 @@
 const session = require("express-session");
 
+const IN_PROD = process.env.NODE_ENV === "production";
+
 const sessionOptions = {
   key: "userId",
-  secret: "secretverysecret",
+  secret: process.env.SESSION_SECRET || "secretverysecret",
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: true, // Must be true in production (HTTPS)
-    httpOnly: true, // Keep for security (no JS access)
-    sameSite: "none", // Required for cross-site cookies when using secure:true
-    maxAge: 1000 * 60 * 60, // 1 hour
+    secure: IN_PROD,
+    httpOnly: true,
+    sameSite: IN_PROD ? "none" : "lax",
+    maxAge: 1000 * 60 * 60,
   },
 };
 
-module.exports = createSession = () => session(sessionOptions);
+module.exports = () => session(sessionOptions);

@@ -6,20 +6,16 @@ const db = require("./models");
 require("dotenv").config();
 
 const app = express();
-
-// Use session middleware
-app.use(createSession());
-
-// CORS config with credentials & correct origin
 app.use(
   cors({
     origin:
-      process.env.CORS_ORIGIN || "https://mohamed-taskmanager.netlify.app", // "https://mohamed-taskmanager.netlify.app"
+      process.env.CORS_ORIGIN || "https://mohamed-taskmanager.netlify.app",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
 
+app.use(createSession());
 app.use(cookieParser());
 
 // JSON body parsing
