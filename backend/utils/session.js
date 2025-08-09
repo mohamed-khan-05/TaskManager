@@ -8,10 +8,10 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: IN_PROD,
-    httpOnly: true,
-    sameSite: IN_PROD ? "none" : "lax",
-    maxAge: 1000 * 60 * 60,
+    secure: IN_PROD, // true only in production (requires HTTPS)
+    httpOnly: true, // recommended for security
+    sameSite: IN_PROD ? "none" : "lax", // none for cross-site in prod, lax for dev
+    maxAge: 1000 * 60 * 60, // 1 hour
   },
 };
 
