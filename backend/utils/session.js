@@ -1,14 +1,14 @@
 const session = require("express-session");
 const SequelizeStore = require("connect-session-sequelize")(session.Store);
-const db = require("../models"); // Adjust path as needed
+const db = require("../models");
 
 const IN_PROD = process.env.NODE_ENV === "production";
 
 const sessionStore = new SequelizeStore({
   db: db.sequelize,
-  tableName: "Session", // optional, default is 'Sessions'
-  checkExpirationInterval: 15 * 60 * 1000, // clean expired sessions every 15 minutes
-  expiration: 24 * 60 * 60 * 1000, // 1 day session expiration
+  tableName: "Session",
+  checkExpirationInterval: 15 * 60 * 1000,
+  expiration: 24 * 60 * 60 * 1000,
 });
 
 const sessionOptions = {
@@ -25,8 +25,6 @@ const sessionOptions = {
   },
 };
 
-module.exports = () => {
-  // Sync session table before returning middleware
-  sessionStore.sync();
-  return session(sessionOptions);
-};
+sessionStore.sync();
+
+module.exports = () => session(sessionOptions);
