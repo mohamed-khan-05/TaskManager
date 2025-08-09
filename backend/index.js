@@ -40,7 +40,9 @@ db.sequelize
     app.listen(port, () => {
       console.log(`Server running on PORT ${port}`);
       console.log(
-        `CORS Origin: ${process.env.CORS_ORIGIN || "http://localhost:5173"}`
+        `CORS Origin: ${
+          process.env.CORS_ORIGIN || "https://mohamed-taskmanager.netlify.app"
+        }`
       );
     });
   })
